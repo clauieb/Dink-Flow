@@ -59,7 +59,11 @@ body.view .dev{display:none!important}
 </section>
 <section class="tab" id="t-board"><div class="pods" id="pods"></div><div class="card"><h2>Full Standings</h2><p class="dim">Ranked by wins, then point difference, win rate and points scored.</p><div style="overflow-x:auto"><table id="stand"></table></div></div><div class="card"><h2>Match History</h2><div id="hist"></div></div></section>
 <section class="tab" id="t-pay"><div class="card"><h2>Game Day Payment</h2><div class="bar"><label>Hours <input type="number" id="hrs" step=".25" min="0" class="dev" style="width:90px"></label><label>Rate ₱/hr <input type="number" id="rate" min="0" step="10" class="dev" style="width:100px"></label>
-<select id="meth" class="dev"><option value="equal">Equal split</option><option value="games">By games played</option></select><b id="tot"></b></div>
+<select id="meth" class="dev">
+  <option value="equal">Equal split</option>
+  <option value="games">By games played</option>
+  <option value="fixed">Fixed price — ₱100/player</option>
+</select>
 <div style="overflow-x:auto"><table id="pay"></table></div><p class="dim" id="paysum"></p></div></section>
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
@@ -192,9 +196,27 @@ var r=rank(),M=['🥇','🥈','🥉'];
 $('#pods').innerHTML=r.length&&r[0].games?[1,0,2].filter(function(i){return r[i]}).map(function(i){var p=r[i];return'<div class="pod'+(i===0?' r1':'')+'"><div class="m">'+(i===0?'🏆':M[i])+'</div><div class="m" style="font-size:30px">'+M[i]+'</div><b>'+esc(p.name)+'</b>'+chip(p)+'<div class="dim">'+p.wins+'W – '+p.losses+'L · diff '+(p.pf-p.pa)+'</div></div>'}).join(''):'<div class="card dim" style="grid-column:1/-1">Play a game to fill the podium.</div>';
 $('#stand').innerHTML='<tr><th>#</th><th>Player</th><th>Level</th><th>W–L</th><th>Win %</th><th>Pts for</th><th>Pts against</th><th>Diff</th></tr>'+r.map(function(p,i){return'<tr><td><b>'+(M[i]||i+1)+'</b></td><td><b>'+esc(p.name)+'</b></td><td>'+chip(p)+'</td><td>'+p.wins+' – '+p.losses+'</td><td>'+(p.games?Math.round(p.wins/p.games*100):0)+'%</td><td>'+p.pf+'</td><td>'+p.pa+'</td><td>'+(p.pf-p.pa)+'</td></tr>'}).join('');
 $('#hist').innerHTML=S.hist.length?S.hist.slice().reverse().map(function(h){return'<div style="padding:8px 0;border-top:1px solid var(--ln);font-size:14px">C'+h.court+' R'+h.round+': <b>'+esc(h.A)+'</b> '+h.sA+' – '+h.sB+' <b>'+esc(h.B)+'</b></div>'}).join(''):'<span class="dim">No games yet.</span>';
-var tot=S.hours*S.rate,pl=S.players.filter(function(p){return p.today||p.games>0}),tg=pl.reduce(function(s,p){return s+p.games},0),paid=0;
-$('#hrs').value=S.hours;$('#rate').value=S.rate;$('#meth').value=S.method;$('#tot').textContent='Total ₱'+tot.toLocaleString();
-$('#pay').innerHTML='<tr><th>Player</th><th>Games</th><th>Amount</th><th>Status</th></tr>'+pl.map(function(p){var a=S.method==='games'?(tg?p.games/tg*tot:0):(pl.length?tot/pl.length:0),ip=!!S.paid[p.id];if(ip)paid+=a;
+var pl=S.players.filter(function(p){return p.today||p.games>0});
+var tg=pl.reduce(function(s,p){return s+p.games},0);
+var fee=100;
+
+var tot = S.method === 'fixed'
+  ? pl.length * fee
+  : S.hours * S.rate;
+
+$('#hrs').value=S.hours;
+$('#rate').value=S.rate;
+$('#meth').value=S.method;
+$('#tot').textContent='Total ₱'+tot.toLocaleString();
+$('#pay').innerHTML='<tr><th>Player</th><th>Games</th><th>Amount</th><th>Status</th></tr>'+pl.map(function(p){var a;
+
+if(S.method==='fixed'){
+  a=100;
+}else if(S.method==='games'){
+  a=tg ? p.games/tg*tot : 0;
+}else{
+  a=pl.length ? tot/pl.length : 0;
+},ip=!!S.paid[p.id];if(ip)paid+=a;
 return'<tr><td><b>'+esc(p.name)+'</b></td><td>'+p.games+'</td><td>₱'+(Math.round(a*100)/100).toLocaleString()+'</td><td>'+(dev?'<button class="btn" data-a="paid" data-id="'+p.id+'" style="'+(ip?'background:#c8f000':'')+'">'+(ip?'Paid':'Unpaid')+'</button>':(ip?'Paid':'Unpaid'))+'</td></tr>'}).join('');
 $('#paysum').textContent='Paid ₱'+(Math.round(paid)).toLocaleString()+' · Due ₱'+(Math.round(tot-paid)).toLocaleString()}
 
