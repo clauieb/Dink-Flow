@@ -74,9 +74,22 @@ var LV={N:{n:'Novice',c:'#1f6fe0',i:0,d:'New to pickleball, with no prior sports
 L:{n:'Low Intermediate',c:'#1fa563',i:1,d:'Has played pickleball for quite some time, or has a background in a racket or net sport such as tennis, badminton or volleyball.'},
 H:{n:'High Intermediate',c:'#e0473f',i:2,d:'DUPR rating of 3.0 and above, with more than six months of regular pickleball play.'}};
 function ball(s){return '<svg class="sp" width="'+s+'" height="'+s+'" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c8f000" stroke="#fff" stroke-width="2.5"/><g fill="#0a0a0a"><circle cx="32" cy="16" r="3.2"/><circle cx="19" cy="26" r="3.2"/><circle cx="45" cy="26" r="3.2"/><circle cx="32" cy="32" r="3.2"/><circle cx="17" cy="40" r="3.2"/><circle cx="47" cy="40" r="3.2"/><circle cx="32" cy="48" r="3.2"/></g></svg>'}
-var NAMES=['Patrick','Clod','Jhec','Aja','Choi','Top','Dey','Rhea','Kiko','Joane','Jake','Deanne','Flo','Ali','Jo','Karen','Win','Amiel','Elle','Yanna','Jheyd'];
 function mk(id,n,l){return{id:id,name:n,lvl:l||'L',wins:0,losses:0,pf:0,pa:0,games:0,wait:0,today:true,pt:{}}}
-function def(){return{date:new Date().toISOString().slice(0,10),players:NAMES.map(function(n,i){return mk(i+1,n)}),nextId:NAMES.length+1,groups:[],courtCount:2,courts:[],hist:[],hours:2,rate:500,method:'equal',paid:{}}}
+function def(){
+  return{
+    date:new Date().toISOString().slice(0,10),
+    players:[],
+    nextId:1,
+    groups:[],
+    courtCount:2,
+    courts:[],
+    hist:[],
+    hours:0,
+    rate:100,
+    method:'equal',
+    paid:{}
+  }
+}
 var S=def(),sel={},beeped={};
 function norm(){var d=def();for(var k in d)if(S[k]==null)S[k]=d[k];
 S.players.forEach(function(p){p.pt=p.pt||{};p.lvl=p.lvl||'L';['wins','losses','pf','pa','games','wait'].forEach(function(f){p[f]=p[f]||0})});
@@ -198,8 +211,23 @@ else if(a==='unlock'){S.groups.splice(i,1);toast('Group unlocked')}
 else if(a==='add'){var nm=$('#nn').value.trim();if(!nm){toast('Enter a name');return}var q=mk(S.nextId++,nm,$('#nl').value),act=S.players.filter(function(x){return x.today});
 if(S.courts.some(function(c){return c.round})&&act.length)q.games=0;S.players.push(q);$('#nn').value=''}
 else if(a==='allin'||a==='allout'){S.players.forEach(function(x){x.today=a==='allin'})}
-else if(a==='reset'){if(!confirm('Start a new game day? Scores, history and payments are cleared. The roster and locked groups stay.'))return;
-S.courts=[];S.hist=[];S.paid={};S.date=new Date().toISOString().slice(0,10);S.players.forEach(function(x){x.wins=x.losses=x.pf=x.pa=x.games=x.wait=0;x.pt={};x.today=false});norm()}
+else if(a==='reset'){
+  if(!confirm('Start a new game day? The roster, scores, history, groups and payments will be cleared.'))return;
+
+  S.players=[];
+  S.groups=[];
+  S.courts=[];
+  S.hist=[];
+  S.paid={};
+  S.nextId=1;
+  S.date=new Date().toISOString().slice(0,10);
+  S.hours=0;
+  S.rate=100;
+  S.method='equal';
+
+  norm();
+  toast('New game day started — clean roster');
+}
 else if(a==='gen'){if(!gen(i))return}
 else if(a==='genall'){var n2=0;S.courts.forEach(function(c,k){if(c.round===0||c.done)if(gen(k))n2++});toast(n2+' court(s) generated')}
 else if(a==='final'){var t=S.players.filter(function(x){return x.today}).sort(function(x,y){return y.wins-x.wins||(y.pf-y.pa)-(x.pf-x.pa)}).slice(0,4);if(t.length<4){toast('Need 4 players');return}
