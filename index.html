@@ -173,7 +173,7 @@ body.view .dev{display:none!important}
 /* ---------- configuration ---------- */
 
 var dev=/[?&]dev=1/.test(location.search);
-var ORGANIZER_PIN='CHANGE-ME'; // <-- set your own PIN
+var ORGANIZER_PIN='1234'; // <-- set your own PIN
 try{
   if(dev&&sessionStorage.getItem('df-ok')!=='1'){
     if(prompt('Organizer PIN')===ORGANIZER_PIN){sessionStorage.setItem('df-ok','1');}
