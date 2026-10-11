@@ -218,7 +218,7 @@ var td=S.players.filter(function(p){return p.today});$('#gp').textContent=td.red
 var w=td.filter(function(p){return!occ[p.id]});$('#wait').innerHTML=w.length?w.map(function(p){return esc(p.name)+' ('+p.games+' games, waited '+p.wait+')'}).join(' · '):'Everyone is on a court.';
 var r=rank(),M=['🥇','🥈','🥉'];
 $('#pods').innerHTML=r.length&&r[0].games?[1,0,2].filter(function(i){return r[i]}).map(function(i){var p=r[i];
-return '<div class="pod'+(i===0?' r1':'')+'"><div class="m">'+(i===0?'🏆':M[i])+'</div>'+av(p)+'<div class="m" style="font-size:30px">'+M[i]+'</div><b>'+esc(p.name)+'</b>'+chip(p)+'<div class="dim">'+p.wins+'W – '+p.losses+'L · diff '+(p.pf-p.pa)+'</div></div>'}).join(''):'<div class="card dim" style="grid-column:1/-1">Play a game to fill the podium.</div>';
+return '<div class="pod'+(i===0?' r1':'')+'">'+(i===0?'<div class="m">🏆</div>':'')+av(p)+'<div class="m" style="font-size:30px">'+M[i]+'</div><b>'+esc(p.name)+'</b>'+chip(p)+'<div class="dim">'+p.wins+'W – '+p.losses+'L · diff '+(p.pf-p.pa)+'</div></div>'}).join(''):'<div class="card dim" style="grid-column:1/-1">Play a game to fill the podium.</div>';
 $('#stand').innerHTML='<tr><th>#</th><th>Player</th><th>Level</th><th>W–L</th><th>Win %</th><th>Pts for</th><th>Pts against</th><th>Diff</th></tr>'+r.map(function(p,i){
 return '<tr><td><b>'+(M[i]||i+1)+'</b></td><td>'+av(p,1)+'<b>'+esc(p.name)+'</b></td><td>'+chip(p)+'</td><td>'+p.wins+' – '+p.losses+'</td><td>'+(p.games?Math.round(p.wins/p.games*100):0)+'%</td><td>'+p.pf+'</td><td>'+p.pa+'</td><td>'+(p.pf-p.pa>0?'+':'')+(p.pf-p.pa)+'</td></tr>'}).join('');
 $('#hist').innerHTML=$('#hist2').innerHTML=histHtml();
