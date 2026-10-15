@@ -112,8 +112,9 @@ function av(p,sm){var t=p.name.trim().split(/\s+/);return '<span class="av'+(sm?
 function L(p){return LV[p.lvl].i}
 function avg(m,f){return m.reduce(function(s,p){return s+f(p)},0)/m.length}
 function rank(){return S.players.filter(function(p){return p.today||p.games>0}).sort(function(a,b){
-if(b.wins!==a.wins)return b.wins-a.wins;var da=a.pf-a.pa,db=b.pf-b.pa;if(db!==da)return db-da;
-var ra=a.games?a.wins/a.games:0,rb=b.games?b.wins/b.games:0;if(rb!==ra)return rb-ra;if(b.pf!==a.pf)return b.pf-a.pf;return a.name.localeCompare(b.name)})}
+var na=a.wins-a.losses,nb=b.wins-b.losses;if(nb!==na)return nb-na;
+var ra=a.games?a.wins/a.games:0,rb=b.games?b.wins/b.games:0;if(rb!==ra)return rb-ra;
+var da=a.pf-a.pa,db=b.pf-b.pa;if(db!==da)return db-da;if(b.pf!==a.pf)return b.pf-a.pf;return a.name.localeCompare(b.name)})}
 /* latecomers: join with wait 0 and count as average games played (matchmaking only) */
 function late(p){if(!S.courts.some(function(c){return c.round}))return;var o=S.players.filter(function(x){return x.today&&x!==p});
 p.wait=0;p.base=(p.games>0||!o.length)?0:Math.round(avg(o,function(x){return x.games+(x.base||0)}))}
