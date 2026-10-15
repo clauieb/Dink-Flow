@@ -124,7 +124,7 @@ return '<div class="hm"><span class="rd">Round '+h.round+'</span> · Court '+h.c
 /* ---------- matchmaking ---------- */
 function near(m,c,n){var r=avg(m,L),w=avg(m,function(p){return p.wins});
 return c.slice().sort(function(a,b){var da=Math.abs(L(a)-r),db=Math.abs(L(b)-r);if(da!==db)return da-db;
-var pa=Math.abs(a.wins-w),pb=Math.abs(b.wins-w);if(pa!==pb)return pa-pb;if(a.wait!==b.wait)return b.wait-a.wait;return Math.random()-.5}).slice(0,n)}
+if(a.wait!==b.wait)return b.wait-a.wait;var pa=Math.abs(a.wins-w),pb=Math.abs(b.wins-w);if(pa!==pb)return pa-pb;return Math.random()-.5}).slice(0,n)}
 function pairScore(A,B){var s=0;[A,B].forEach(function(t){s-=40*((t[0].pt||{})[t[1].id]||0)});
 var w=function(t){return t[0].wins+t[1].wins},l=function(t){return L(t[0])+L(t[1])};
 return s-8*Math.abs(w(A)-w(B))-10*Math.abs(l(A)-l(B))}
